@@ -1,0 +1,22 @@
+[
+  {
+    "id": "6xv0srjdglf86heok",
+    "_": [
+      "add"
+    ],
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "1234",
+    "$0": "user.js"
+  },
+  {
+    "id": "6xv0src64lf86hv0x",
+    "_": [
+      "add"
+    ],
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "secret",
+    "$0": "user.js"
+  }
+]
