@@ -1,0 +1,9 @@
+Node:
+1- Access to the file system:Node.js has built-in modules that allow developers to read, write, and modify files on a computer's file system. 
+2- Server-side functionality: Node.js is designed to be a server-side language, HTTP requests, and database access. These features are not available in client-side JavaScript.
+3-Access to Operating System Resources: Node.js can interact with operating system resources like network interfaces, system processes
+
+client JavaScript 
+1-DOM Manipulation: Client-side JavaScript can manipulate the Document Object Model (DOM) 
+2-Event Handling: Client-side JavaScript can handle events like mouse clicks, keyboard input, and page load
+3- Access to Web APIs: Client-side JavaScript can access various web APIs, like geolocation, web storage
