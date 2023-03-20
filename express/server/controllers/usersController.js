@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-
+const bcrypt = require('bcrypt');
 const dataPath = path.resolve(__dirname, '../../db/users');
 
 //@desc get all users
@@ -16,7 +16,7 @@ const getUsers = (req, res) => {
 //@desc create users
 //@route POST /api/users
 //@access public
-const addUser = (req, res) => {
+const addUser = async (req, res) => {
   const {
     userName,
     password,
@@ -27,11 +27,24 @@ const addUser = (req, res) => {
     throw new Error("all fields are required")
   } else {
     const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
     const user = {
       id: data.length + 1,
       ...req.body
     };
-    data.push(user);
+
+    const hashedPassword = await bcrypt.hash(user.password, 10)
+
+    const newUser = {
+      id: user.id,
+      userName,
+      email,
+      password: hashedPassword
+    }
+
+
+    data.push(newUser);
+
     fs.writeFileSync(dataPath, JSON.stringify(data));
     res.status(201).json({
       message: "created user successfully"
