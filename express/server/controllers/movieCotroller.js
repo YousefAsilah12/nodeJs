@@ -1,12 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 
-const dataPath = path.resolve(__dirname, '../data');
+const dataPath = path.resolve(__dirname, '../../db/movies');
 
 //@desc get all movies
 //@route Get /api/movies
 //@access public
 const getMovies = (req, res) => {
+  console.log("hello");
   const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
   res.status(200).json({
     data
