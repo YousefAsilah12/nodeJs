@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../controllers/auth')
 const {
   getUsers,
   addUser,
   getUser,
   deleteUser,
-  putUser
+  putUser,
+  loginUser
 } = require('../controllers/usersController')
 
 
@@ -16,9 +18,11 @@ const {
 // router.route("/:id").put(putMovie)
 
 //the same route shorter way :
+router.route("/login").post(loginUser)
 router.route("/").get(getUsers).post(addUser);
-router.route("/:id").get(getUser).delete(deleteUser).put(putUser)
 
+router.use(auth)
+router.route("/:id").get(getUser).delete(deleteUser).put(putUser)
 
 
 
