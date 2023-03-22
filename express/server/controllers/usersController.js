@@ -117,9 +117,13 @@ const addUser = async (req, res, next) => {
 //@access public
 const putUser = async (req, res, next) => {
   try {
-    const {id} = req.params;
-    const result=await User.replaceOne({_id:id},req.body)
-    if(!result) throw new Error ("cannot be updated")
+    const {
+      id
+    } = req.params;
+    const result = await User.replaceOne({
+      _id: id
+    }, req.body)
+    if (!result) throw new Error("cannot be updated")
     console.log(result);
     res.status(200).json({
       message: "updated user"
@@ -134,19 +138,17 @@ const putUser = async (req, res, next) => {
 //@access public
 const getUser = async (req, res, next) => {
 
+
   try {
-
-    try {
-      const {
-        id
-      } = req.params
-      const user = await User.findById(id)
-      res.status(200).json(user);
-    } catch (e) {
+    const {
+      id
+    } = req.params
+    const user = await User.findById(id)
+    if (!user) {
       res.status(404);
-      throw new Error(e.message);
+      throw new Error("not found");
     }
-
+    res.status(200).json(user);
   } catch (e) {
     next(e)
   }
@@ -155,22 +157,33 @@ const getUser = async (req, res, next) => {
 //@desc delete a user
 //@route DELETE /api/users/:id
 //@access public
-const deleteUser = (req, res) => {
-  const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-  const id = parseInt(req.params.id);
-  const user = data.find(d => d.id === id);
-  if (!user) {
-    res.status(404);
-    throw new Error("user not found");
+const deleteUser = async (req, res, next) => {
+  try {
+    const {
+      id
+    } = req.params;
+    const user = await User.findById(id)
+    if (!user) {
+      res.status(404);
+      throw new Error("not found");
+      return
+    }
+    const result = await User.deleteOne({
+      _id: id
+    })
+    if (!result) {
+      res.status(404);
+      throw new Error("failed to delete")
+      return;
+    }
+    res.status(200).json({
+      message: `deleted user ${id}`
+    });
+  } catch (e) {
+    next(e);
   }
-  const index = data.indexOf(user);
-  data.splice(index, 1);
-  fs.writeFileSync(dataPath, JSON.stringify(data));
-  console.log(`deleted user ${id}`);
-  res.status(200).json({
-    message: `deleted user ${id}`
-  });
 };
+
 
 module.exports = {
   getUsers,
