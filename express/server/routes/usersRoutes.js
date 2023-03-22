@@ -21,7 +21,7 @@ const {
 router.route("/login").post(loginUser)
 router.route("/").get(getUsers).post(addUser);
 
-// router.use(auth)
+router.use(auth)
 router.route("/:id").get(getUser).delete(deleteUser).put(putUser)
 
 

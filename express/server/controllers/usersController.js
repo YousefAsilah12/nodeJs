@@ -13,12 +13,9 @@ const loginUser = async (req, res, next) => {
     password
   } = req.body;
   try {
-    // Read user data from file
-    const userData = fs.readFileSync(dataPath, 'utf8');
-    const users = JSON.parse(userData);
 
     // Find user by email
-    const user = users.find(u => u.email === email);
+    const user = await User.findOne({ email: email})
     if (!user) {
       res.statusCode = 404;
       throw new Error('User not found');
@@ -60,11 +57,19 @@ const loginUser = async (req, res, next) => {
 //@desc get all users
 //@route Get /api/users
 //@access public
-const getUsers = (req, res) => {
-  const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-  res.status(200).json({
-    data
-  });
+const getUsers = async (req, res,next) => {
+  console.log("all");
+  try{
+    const users=await User.find()
+    if(!users){
+      throw new Error("no data available")
+    }
+
+    res.status(200).json({
+      users
+    });
+  }catch(e){
+  }
 };
 
 //@desc create users
