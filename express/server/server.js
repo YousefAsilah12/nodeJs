@@ -25,7 +25,7 @@ app.use(errorHandler);
 
 
 const start = async () => {
-  const {PASSWORD,CONNECTION}=process.env
+  const {CONNECTION}=process.env
   try {
     await mongoose.connect(CONNECTION);
   } catch (error) {

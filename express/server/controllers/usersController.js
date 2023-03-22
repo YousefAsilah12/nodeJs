@@ -3,6 +3,8 @@ const fs = require('fs');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const dataPath = path.resolve(__dirname, '../../db/users');
+const mongoose = require('mongoose');
+const User = require("../model/User")
 require('dotenv').config()
 
 const loginUser = async (req, res, next) => {
@@ -68,78 +70,86 @@ const getUsers = (req, res) => {
 //@desc create users
 //@route POST /api/users
 //@access public
-const addUser = async (req, res) => {
+const addUser = async (req, res, next) => {
   const {
     userName,
     password,
     email
   } = req.body;
-  if (!email || !password || !userName) {
-    res.status(400);
-    throw new Error("all fields are required")
-  } else {
-    const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+  try {
+    if (!email || !password || !userName) {
+      res.status(400);
+      throw new Error("all fields are required")
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10)
 
-    const user = {
-      id: data.length + 1,
-      ...req.body
-    };
-
-    const hashedPassword = await bcrypt.hash(user.password, 10)
-
-    const newUser = {
-      id: user.id,
-      userName,
-      email,
-      password: hashedPassword,
-      type: "user"
+      try {
+        const newUser = new User({
+          userName: userName,
+          email: email,
+          password: hashedPassword,
+          type: "user"
+        })
+        console.log(newUser);
+        await newUser.save()
+        res.status(201).json({
+          message: "created user successfully",
+          newUser: newUser
+        })
+      } catch (e) {
+        if (e.code === 11000) {
+          res.status(400)
+          throw new Error(e.message);
+        } else {
+          res.status(500).json({
+            message: "failed to create user"
+          });
+        }
+      }
     }
-
-
-    data.push(newUser);
-
-    fs.writeFileSync(dataPath, JSON.stringify(data));
-    res.status(201).json({
-      message: "created user successfully"
-    })
+  } catch (err) {
+    next(err)
   }
 };
 
 //@desc update a user
 //@route PUT /api/users/:id
 //@access public
-const putUser = (req, res) => {
-  const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-  const id = parseInt(req.params.id);
-  const user = data.find(d => d.id === id);
-  if (!user) {
-    res.status(404);
-    throw new Error("user not found");
+const putUser = async (req, res, next) => {
+  try {
+    const {id} = req.params;
+    const result=await User.replaceOne({_id:id},req.body)
+    if(!result) throw new Error ("cannot be updated")
+    console.log(result);
+    res.status(200).json({
+      message: "updated user"
+    });
+  } catch (error) {
+    next(error);
   }
-  const updatedUser = {
-    ...user,
-    ...req.body
-  };
-  const index = data.indexOf(user);
-  data[index] = updatedUser;
-  fs.writeFileSync(dataPath, JSON.stringify(data));
-  res.status(200).json({
-    message: "updated user"
-  });
 };
 
 //@desc get a user
 //@route GET /api/users/:id
 //@access public
-const getUser = (req, res) => {
-  const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
-  const user = data.find(d => d.id === parseInt(req.params.id))
-  if (!user) {
-    res.status(404);
-    throw new Error("user not found");
-    return
+const getUser = async (req, res, next) => {
+
+  try {
+
+    try {
+      const {
+        id
+      } = req.params
+      const user = await User.findById(id)
+      res.status(200).json(user);
+    } catch (e) {
+      res.status(404);
+      throw new Error(e.message);
+    }
+
+  } catch (e) {
+    next(e)
   }
-  res.status(200).json(user);
 };
 
 //@desc delete a user
