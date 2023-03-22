@@ -2,9 +2,9 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 const auth = async (req, res, next) => {
-  console.log("hello");
   const cookie = req.cookies;
   const token = cookie.jwt;
+  console.log("hello");
   if (!token) {
     return res.status(401).send({
       message: 'Unauthorized'
